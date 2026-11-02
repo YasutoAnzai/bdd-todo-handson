@@ -31,6 +31,11 @@
 
 に置き換えて再実行すると **2 passed**。これが「書いた振る舞いが評価になる」瞬間です。
 
+> **重要**: ルート直下での `py -m pytest` は **unit だけ**を実行します（最短体験用）。
+> `server/`（server-medium）と `web-test/`（client-medium）は依存が違うので、
+> **それぞれのフォルダに入って** `py -m pytest` してください（各 README 参照）。
+> 各テストは自分の feature を絶対パスで解決するので、起動ディレクトリに依存しません。
+
 ## 画面で見たい（client-medium）
 
 `web/index.html` をダブルクリック → ブラウザで TODO が動きます（依存ゼロ）。詳細は `web/README.md`。

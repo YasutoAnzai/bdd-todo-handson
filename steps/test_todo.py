@@ -1,8 +1,15 @@
 """usecase.md の Given/When/Then が、そのまま step になる。"""
+import sys
+from pathlib import Path
+
 from pytest_bdd import scenarios, given, when, then, parsers
+
+# このファイルの位置を基準に解決する(どこから pytest を起動しても壊れない)
+_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(_ROOT))
 from todo import TodoList
 
-scenarios("../features/todo.feature")
+scenarios(str(_ROOT / "features" / "todo.feature"))
 
 
 @given("TODOリストが空である", target_fixture="todo")

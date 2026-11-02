@@ -21,7 +21,7 @@ from pytest_bdd import scenarios, given, when, then
 
 INDEX = (Path(__file__).resolve().parents[1] / "web" / "index.html").as_uri()
 
-scenarios("../features/todo_screen.feature")
+scenarios(str(Path(__file__).resolve().parent / "features" / "todo_screen.feature"))
 
 
 @pytest.fixture

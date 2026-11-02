@@ -14,7 +14,7 @@ from pytest_bdd import scenarios, given, when, then
 # server/app.py を import できるようにする
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-scenarios("../features/todo_api.feature")
+scenarios(str(Path(__file__).resolve().parents[1] / "features" / "todo_api.feature"))
 
 
 @pytest.fixture
