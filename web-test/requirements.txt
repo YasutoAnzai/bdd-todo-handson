@@ -1,0 +1,4 @@
+# client-medium 用。node 不要(Python の Playwright がブラウザを同梱)。
+pytest>=8,<9
+pytest-bdd==9.0.0
+pytest-playwright>=0.5,<0.8

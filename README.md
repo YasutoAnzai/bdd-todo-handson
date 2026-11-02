@@ -9,7 +9,7 @@
 | 評価レイヤー | どこで | 動かし方(Windows) |
 | --- | --- | --- |
 | **(unit)** 純粋ロジック | `./`（pytest 版）/ `web/index.html` 内の `TodoLogic` | 下記「最短体験」 |
-| **(client-medium)** 画面結合 | `web/index.html` | ダブルクリックで開く。Playwright で画面検証も可 |
+| **(client-medium)** 画面結合 | `web/index.html` / `web-test/`（Playwright） | ダブルクリックで開く。`web-test/` で画面を自動検証 |
 | **(server-medium)** API+DB 結合 | `server/`（Flask + SQLite） | `server/README.md` 参照 |
 
 同じ振る舞い「未完了が0件になる」を、unit でも client-medium でも server-medium でも評価できる——
@@ -38,6 +38,10 @@
 ## API+DB で見たい（server-medium）
 
 `server/` で Flask + SQLite 版を起動（`server/README.md`）。DB は SQLite ファイル1個、追加インストール不要。
+
+## 画面を自動テストしたい（client-medium）
+
+`web-test/` で Playwright が実ブラウザを開き「追加→完了→未完了0件」を画面で検証（`web-test/README.md`）。
 
 ## ファイル全体図
 
