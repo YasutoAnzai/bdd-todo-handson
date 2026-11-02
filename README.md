@@ -1,60 +1,56 @@
-# BDD ハンズオン・キット（TODOシステム / Windows ですぐ動く）
+# BDD ハンズオン・キット（TODO / Windows ですぐ動く）
 
-「振る舞いを書く（usecase.md）」→「評価する（テスト）」が1本に繋がる体験を、
-超簡単な TODO 機能で 5 分体感するキットです。node 不要・Python だけ。
+「振る舞いを **usecase.md に書く**」→「そのまま **評価する**」が1本に繋がる体験を、
+超簡単な TODO 機能で体感するキットです。node 不要で始められ、同じ振る舞いを
+**3つの評価レイヤー**で確かめられます。
 
-## 用意するもの
+## 3つのレイヤー（このキットの地図）
 
-- Windows + Python 3.10 以上（`py --version` で確認。無ければ https://www.python.org/ から入れる／社内手順に従う）
-- このフォルダ一式
+| 評価レイヤー | どこで | 動かし方(Windows) |
+| --- | --- | --- |
+| **(unit)** 純粋ロジック | `./`（pytest 版）/ `web/index.html` 内の `TodoLogic` | 下記「最短体験」 |
+| **(client-medium)** 画面結合 | `web/index.html` | ダブルクリックで開く。Playwright で画面検証も可 |
+| **(server-medium)** API+DB 結合 | `server/`（Flask + SQLite） | `server/README.md` 参照 |
 
-## 手順（PowerShell か コマンドプロンプトに貼るだけ）
+同じ振る舞い「未完了が0件になる」を、unit でも client-medium でも server-medium でも評価できる——
+**書く時点でどのレイヤーで評価するか決める**、がこのキットの主役メッセージです。
 
-このフォルダで以下を順に実行します。
+## 最短体験（pytest 版・node不要）
+
+このフォルダで:
 
     py -m venv .venv
     .venv\Scripts\activate
     py -m pip install -r requirements.txt
     py -m pytest -q
 
-PowerShell で activate が実行ポリシーで止まる場合は、有効化せずそのまま
-`.venv\Scripts\python.exe -m pytest -q` でも動きます。
-
-### 1 回目の実行結果（これが正しい）
-
-    1 passed, 1 failed
-
-- passed＝「追加」の振る舞いは実装済みで緑。
-- failed＝「完了件数が0件になる」の判定を **わざと TODO（未実装）** にしてあります。
-
-### あなたのタスク（1 行だけ）
-
-steps\test_todo.py の一番下 pending_zero 関数の TODO 行を、次の 1 行に置き換えます。
+初回は **1 passed / 1 failed**（完了判定をわざと TODO にしてある）。
+`steps\test_todo.py` の最後の TODO 行を
 
     assert todo.pending_count() == 0
 
-（元の raise NotImplementedError(...) を消して上の 1 行にする）
+に置き換えて再実行すると **2 passed**。これが「書いた振る舞いが評価になる」瞬間です。
 
-### もう一度実行
+## 画面で見たい（client-medium）
 
-    py -m pytest -q
-    2 passed
+`web/index.html` をダブルクリック → ブラウザで TODO が動きます（依存ゼロ）。詳細は `web/README.md`。
 
-緑になりました。usecase.md に書いた日本語の振る舞いが、そのままテストになって評価された——これが BDD の肝です。
+## API+DB で見たい（server-medium）
 
-## ファイルの地図
+`server/` で Flask + SQLite 版を起動（`server/README.md`）。DB は SQLite ファイル1個、追加インストール不要。
 
-| ファイル | 役割 |
+## ファイル全体図
+
+| 場所 | 役割 |
 | --- | --- |
-| PA_TODO_01.usecase.md | 振る舞いの SSOT。前提=Given / トリガー=When / 概要=Then、備考に評価レイヤー |
-| features\todo.feature | 日本語 Gherkin（# language: ja）。usecase.md の各行がそのまま写っている |
-| steps\test_todo.py | ステップ定義。Given/When/Then と同じ文が関数に紐づく（1 箇所 TODO） |
-| todo.py | 本番ロジック（外部 I/O なしの純粋関数＝評価レイヤーは unit） |
-| requirements.txt | 依存のバージョン固定（pytest 8 系 / pytest-bdd 9.0.0） |
-| pytest.ini | feature の場所と警告抑制 |
+| `PA_TODO_01.usecase.md` | 振る舞いの SSOT（Given/When/Then＋評価レイヤー） |
+| `features/` `steps/` `todo.py` | unit の pytest-bdd 一式 |
+| `web/index.html` | 単一HTML アプリ（unit ロジック＋画面） |
+| `server/app.py` ほか | Flask + SQLite アプリ＋ server-medium テスト |
+| `requirements.txt` `pytest.ini` | 依存固定・設定 |
 
-## なぜこの題材・この構成か
+## 備考
 
-- TODO は全員が仕様を 3 秒で理解できる題材。BDD の「書く↔評価」の構造だけに集中できる。
-- 実プロジェクトは npx tsx + playwright-bdd（node 必要）。環境未整備の人が 15 分を環境構築で溶かさないよう、考え方が 100% 同じ pytest-bdd（Python）で体験部分だけ切り出し。
-- pytest-bdd 9.0.0 は pytest 9 系と非互換なので pytest>=8,<9 に固定済み（罠を踏まない）。
+- pytest-bdd 9.0.0 は pytest 9 系と非互換のため `pytest>=8,<9` に固定済み。
+- 実プロジェクトは `npx tsx` + playwright-bdd（node 必要）。本キットは考え方を同じにしたまま、
+  環境でこけないよう Python/単一HTML に寄せた体験版です。

@@ -1,0 +1,4 @@
+# server-medium 用。Windows/Mac/Linux 共通。
+flask>=3,<4
+pytest>=8,<9
+pytest-bdd==9.0.0

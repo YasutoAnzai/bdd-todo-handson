@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My TODO (単一HTML版)</title>
+  <style>
+    :root {
+      --bg: #f4f5f7; --card: #ffffff; --fg: #1a1d23; --muted: #6b7280;
+      --border: #e2e5ea; --primary: #2563eb; --primary-fg: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--bg); color: var(--fg); margin: 0; padding: 32px 16px;
+    }
+    .card {
+      max-width: 520px; margin: 0 auto; background: var(--card);
+      border: 1px solid var(--border); border-radius: 14px; padding: 24px 26px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    h1 { margin: 0 0 2px; font-size: 22px; }
+    .counter { margin: 0 0 18px; font-size: 13px; color: var(--muted); }
+    .counter strong { color: var(--fg); }
+    .input-row { display: flex; gap: 8px; margin-bottom: 18px; }
+    #title {
+      flex: 1; padding: 9px 12px; border: 1px solid var(--border);
+      border-radius: 8px; font-size: 14px;
+    }
+    #add {
+      padding: 9px 18px; border: none; border-radius: 8px;
+      background: var(--primary); color: var(--primary-fg);
+      font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    li {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border: 1px solid var(--border); border-radius: 9px;
+    }
+    li.done { opacity: .65; background: #fafafa; }
+    li.done .title { text-decoration: line-through; color: var(--muted); }
+    .title { flex: 1; font-size: 14.5px; }
+    .del {
+      padding: 4px 10px; border: 1px solid var(--border); border-radius: 6px;
+      background: transparent; color: var(--muted); font-size: 12px; cursor: pointer;
+    }
+    .empty { color: var(--muted); font-size: 13px; padding: 8px 2px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>📝 My TODO</h1>
+    <!-- 未完了件数(Then の観測点)。BDD: 「未完了が0件になる」をここで検証できる -->
+    <p class="counter">未完了 <strong id="pending">0</strong> 件 / 全 <span id="total">0</span> 件</p>
+
+    <div class="input-row">
+      <input id="title" placeholder="やることを入力…" autocomplete="off">
+      <button id="add">追加</button>
+    </div>
+
+    <ul id="list"></ul>
+  </div>
+
+  <script>
+    // ----- 純粋ロジック(評価レイヤー=unit)。画面に依存しない -----
+    // この関数群だけを取り出して unit テストできる形にしてある。
+    const TodoLogic = {
+      add(items, title) {
+        const t = String(title).trim();
+        if (t === "") return items; // 空タイトルは追加しない(準正常)
+        return [...items, { id: Date.now() + Math.random(), title: t, done: false }];
+      },
+      toggle(items, id) {
+        return items.map(i => i.id === id ? { ...i, done: !i.done } : i);
+      },
+      remove(items, id) {
+        return items.filter(i => i.id !== id);
+      },
+      pendingCount(items) {
+        return items.filter(i => !i.done).length;
+      },
+    };
+    // Playwright 等から呼べるよう公開(client-medium テスト用)
+    window.TodoLogic = TodoLogic;
+
+    // ----- 画面(評価レイヤー=client-medium の対象) -----
+    const KEY = "bdd-todo-items";
+    let items = JSON.parse(localStorage.getItem(KEY) || "[]");
+
+    const $ = (id) => document.getElementById(id);
+    function save() { localStorage.setItem(KEY, JSON.stringify(items)); }
+
+    function render() {
+      const list = $("list");
+      list.innerHTML = "";
+      if (items.length === 0) {
+        const li = document.createElement("li");
+        li.className = "empty";
+        li.textContent = "まだ何もありません。上の欄から追加してください。";
+        list.appendChild(li);
+      }
+      for (const it of items) {
+        const li = document.createElement("li");
+        li.className = it.done ? "done" : "";
+        li.dataset.title = it.title;
+
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = it.done;
+        cb.setAttribute("aria-label", "完了にする: " + it.title);
+        cb.addEventListener("change", () => { items = TodoLogic.toggle(items, it.id); commit(); });
+
+        const span = document.createElement("span");
+        span.className = "title";
+        span.textContent = it.title;
+
+        const del = document.createElement("button");
+        del.className = "del";
+        del.textContent = "削除";
+        del.addEventListener("click", () => { items = TodoLogic.remove(items, it.id); commit(); });
+
+        li.append(cb, span, del);
+        list.appendChild(li);
+      }
+      $("pending").textContent = TodoLogic.pendingCount(items);
+      $("total").textContent = items.length;
+    }
+
+    function commit() { save(); render(); }
+
+    $("add").addEventListener("click", () => {
+      items = TodoLogic.add(items, $("title").value);
+      $("title").value = "";
+      commit();
+    });
+    $("title").addEventListener("keydown", (e) => { if (e.key === "Enter") $("add").click(); });
+
+    render();
+  </script>
+</body>
+</html>
