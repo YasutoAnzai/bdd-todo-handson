@@ -11,7 +11,7 @@
     .venv\Scripts\activate
     py -m pip install -r requirements.txt
     py -m playwright install chromium
-    py -m pytest -q
+    py -m pytest -q --headed --slowmo 3000
 
 **1 passed** になれば成功。
 （`playwright install chromium` は初回だけ。ブラウザ本体をダウンロードします。社内プロキシ環境では
