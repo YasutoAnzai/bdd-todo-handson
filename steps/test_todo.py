@@ -1,8 +1,12 @@
-"""usecase.md の Given/When/Then が、そのまま step になる。"""
+"""usecase.md の Given/When/Then が、そのまま step になる（unit / 純粋ロジック）。
+
+観測点 = todo.py の純粋関数の戻り値。
+同じ文の step を、client-medium は画面で、server-medium は API+DB で観測する。
+"""
 import sys
 from pathlib import Path
 
-from pytest_bdd import scenarios, given, when, then, parsers
+from pytest_bdd import scenarios, given, when, then
 
 # このファイルの位置を基準に解決する(どこから pytest を起動しても壊れない)
 _ROOT = Path(__file__).resolve().parents[1]
@@ -39,7 +43,7 @@ def shown_once(todo):
     assert todo.titles() == ["牛乳を買う"]
 
 
-@then("未完了の件数が0件になる")
+@then("その項目が完了状態になり、未完了件数が0件になる")
 def pending_zero(todo):
     # TODO(ハンズオン): ここを1行実装してください。
     #   ヒント: todo.pending_count() が 0 であることを assert する

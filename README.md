@@ -15,6 +15,21 @@
 同じ振る舞い「未完了が0件になる」を、unit でも client-medium でも server-medium でも評価できる——
 **書く時点でどのレイヤーで評価するか決める**、がこのキットの主役メッセージです。
 
+### 同じ言葉が3層をつなぐ（重要）
+
+3つの feature の **Given/When/Then の日本語文は完全に同一**で、各シナリオは
+同じ `@SYS-UC-TODO-01-001` / `@SYS-UC-TODO-01-002`（UC-ID）タグで
+`PA_TODO_01.usecase.md` の1行に紐づきます。違うのは「ならば（Then）を**何で観測するか**」だけ:
+
+| 同じ振る舞い | (unit) | (client-medium) | (server-medium) |
+| --- | --- | --- | --- |
+| 追加(UC-001) | 関数の戻り値 | 画面のリスト表示 | API 一覧＋DB |
+| 完了(UC-002) | `pending_count()==0` | 画面の未完了件数の表示 | API の `pending==0` |
+
+`features/todo.feature`・`web-test/features/todo_screen.feature`・`server/features/todo_api.feature`
+を見比べると、**本文がそのまま一致**しているのが分かります。これが
+「同じ usecase.md の言葉が、クライアント評価とサーバ評価の両方につながる」実物です。
+
 ## 最短体験（pytest 版・node不要）
 
 このフォルダで:
